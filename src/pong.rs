@@ -20,6 +20,7 @@ impl SimpleState for MyState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
 
+        initialise_paddles(world);
         initialise_camera(world);
     }
 }
@@ -50,9 +51,12 @@ pub struct Paddle {
     pub width: f32,
     pub height: f32,
 }
-
-impl Component for Paddle {
-    type Storage = DenseVecStorage<Self>;
+impl amethyst::ecs::Component for Paddle {
+    type Storage = amethyst::ecs::VecStorage<Paddle>;
+}
+fn register() {
+    let mut world = amethyst::ecs::World::new();
+    world.register::<Paddle>();
 }
 
 impl Paddle {
@@ -63,4 +67,28 @@ impl Paddle {
             height: 1.0,
         }
     }
+}
+
+fn initialise_paddles(world: &mut World) {
+    let mut left_transform = Transform::default();
+    let mut right_transform = Transform::default();
+
+    // Correctly position the paddles.
+    let y = ARENA_HEIGHT / 2.0;
+    left_transform.set_xyz(PADDLE_WIDTH * 0.5, y, 0.0);
+    right_transform.set_xyz(ARENA_WIDTH - PADDLE_WIDTH * 0.5, y, 0.0);
+
+    // Create a left plank entity.
+    world
+        .create_entity()
+        .with(Paddle::new(Side::Left))
+        .with(left_transform)
+        .build();
+
+    // Create right plank entity.
+    world
+        .create_entity()
+        .with(Paddle::new(Side::Right))
+        .with(right_transform)
+        .build();
 }

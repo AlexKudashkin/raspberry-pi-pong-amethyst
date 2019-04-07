@@ -3,6 +3,7 @@ mod pong;
 use crate::pong::Pong;
 use amethyst::prelude::*;
 use amethyst::utils::application_root_dir;
+use amethyst::core::transform::TransformBundle;
 use amethyst::renderer::{DisplayConfig, DrawFlat2D, Event, Pipeline,
                          RenderBundle, Stage, VirtualKeyCode};
 fn main() -> amethyst::Result<()> {
@@ -16,10 +17,11 @@ fn main() -> amethyst::Result<()> {
             .with_pass(DrawFlat2D::new()),
     );
     let game_data = GameDataBuilder::default()
-    .with_bundle(
-      RenderBundle::new(pipe, Some(config))
-        .with_sprite_sheet_processor()
-    )?;
+        .with_bundle(
+          RenderBundle::new(pipe, Some(config))
+            .with_sprite_sheet_processor()
+        )?
+        .with_bundle(TransformBundle::new())?;
     let mut game = Application::new("./", Pong, game_data)?;
     game.run();
 
