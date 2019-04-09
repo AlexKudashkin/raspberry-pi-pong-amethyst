@@ -1,16 +1,22 @@
 extern crate amethyst;
+
 mod pong;
+mod systems;
 
 use amethyst::{
     core::transform::TransformBundle,
     prelude::*,
     renderer::{DisplayConfig, DrawFlat2D, Pipeline, RenderBundle, Stage},
     utils::application_root_dir,
+    input::InputBundle,
 };
 
 fn main() -> amethyst::Result<()> {
-    amethyst::start_logger(Default::default());
+    //amethyst::start_logger(Default::default());
+
     use crate::pong::Pong;
+    use crate::systems::paddle::PaddleSystem;
+
     let path = "./resources/display_config.ron";
     let config = DisplayConfig::load(&path);
 
@@ -19,9 +25,17 @@ fn main() -> amethyst::Result<()> {
             .clear_target([0.0, 0.0, 0.0, 1.0], 1.0)
             .with_pass(DrawFlat2D::new()),
     );
+
+    let binding_path = "./resources/bindings_config.ron";
+
+    let input_bundle = InputBundle::<String, String>::new()
+        .with_bindings_from_file(binding_path)?;
+
     let game_data = GameDataBuilder::default()
         .with_bundle(RenderBundle::new(pipe, Some(config)).with_sprite_sheet_processor())?
-        .with_bundle(TransformBundle::new())?;
+        .with_bundle(TransformBundle::new())?
+        .with_bundle(input_bundle)?
+        .with(systems::PaddleSystem, "paddle_system", &["input_system"]);
 
     let mut game = Application::new("./", Pong, game_data)?;
     game.run();

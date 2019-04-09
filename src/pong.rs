@@ -9,11 +9,11 @@ use amethyst::{
     },
 };
 
-const ARENA_HEIGHT: f32 = 100.0;
-const ARENA_WIDTH: f32 = 100.0;
+pub const ARENA_HEIGHT: f32 = 100.0;
+pub const ARENA_WIDTH: f32 = 100.0;
 
-const PADDLE_HEIGHT: f32 = 16.0;
-const PADDLE_WIDTH: f32 = 4.0;
+pub const PADDLE_HEIGHT: f32 = 16.0;
+pub const PADDLE_WIDTH: f32 = 4.0;
 
 pub struct Pong;
 
@@ -26,20 +26,18 @@ impl SimpleState for Pong {
         // `texture` is the pixel data.
         let sprite_sheet_handle = load_sprite_sheet(world);
 
-        world.register::<Paddle>();
-
         initialise_paddles(world, sprite_sheet_handle);
         initialise_camera(world);
     }
 }
 
 #[derive(PartialEq, Eq)]
-enum Side {
+pub enum Side {
     Left,
     Right,
 }
 
-struct Paddle {
+pub struct Paddle {
     pub side: Side,
     pub width: f32,
     pub height: f32,
