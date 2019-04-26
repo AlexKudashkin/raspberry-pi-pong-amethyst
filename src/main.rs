@@ -15,9 +15,6 @@ fn main() -> amethyst::Result<()> {
 //    amethyst::start_logger(Default::default());
 
     use crate::pong::Pong;
-//    use crate::systems::paddle::PaddleSystem;
-//    use crate::systems::move_balls::MoveBallsSystem;
-//    use crate::systems::bounce::BounceSystem;
 
     let app_root = application_root_dir();
 
@@ -45,7 +42,8 @@ fn main() -> amethyst::Result<()> {
             systems::bounce::BounceSystem,
             "collision_system",
             &["paddle_system", "ball_system"],
-        );
+        )
+        .with(systems::WinnerSystem, "winner_system", &["ball_system"]);
 
     let mut game = Application::new("./", Pong, game_data)?;
     game.run();
