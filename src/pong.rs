@@ -1,3 +1,5 @@
+extern crate amethyst;
+
 use amethyst::{
     assets::{AssetStorage, Loader},
     core::transform::Transform,
@@ -15,6 +17,10 @@ pub const ARENA_WIDTH: f32 = 100.0;
 pub const PADDLE_HEIGHT: f32 = 16.0;
 pub const PADDLE_WIDTH: f32 = 4.0;
 
+pub const BALL_VELOCITY_X: f32 = 75.0;
+pub const BALL_VELOCITY_Y: f32 = 50.0;
+pub const BALL_RADIUS: f32 = 2.0;
+
 pub struct Pong;
 
 impl SimpleState for Pong {
@@ -25,7 +31,9 @@ impl SimpleState for Pong {
         // `spritesheet` is the layout of the sprites on the image;
         // `texture` is the pixel data.
         let sprite_sheet_handle = load_sprite_sheet(world);
+        world.register::<Ball>(); // <- add this line temporarily
 
+        initialise_ball(world, sprite_sheet_handle.clone()); // <- add this line
         initialise_paddles(world, sprite_sheet_handle);
         initialise_camera(world);
     }
@@ -54,6 +62,15 @@ impl Paddle {
 }
 
 impl Component for Paddle {
+    type Storage = DenseVecStorage<Self>;
+}
+
+pub struct Ball {
+    pub velocity: [f32; 2],
+    pub radius: f32,
+}
+
+impl Component for Ball {
     type Storage = DenseVecStorage<Self>;
 }
 
@@ -133,5 +150,28 @@ fn initialise_paddles(world: &mut World, sprite_sheet_handle: SpriteSheetHandle)
         .with(Flipped::Horizontal)
         .with(Paddle::new(Side::Right))
         .with(right_transform)
+        .build();
+}
+
+/// Initialises one ball in the middle-ish of the arena.
+fn initialise_ball(world: &mut World, sprite_sheet_handle: SpriteSheetHandle) {
+    // Create the translation.
+    let mut local_transform = Transform::default();
+    local_transform.set_xyz(ARENA_WIDTH / 2.0, ARENA_HEIGHT / 2.0, 0.0);
+
+    // Assign the sprite for the ball
+    let sprite_render = SpriteRender {
+        sprite_sheet: sprite_sheet_handle,
+        sprite_number: 1, // ball is the second sprite on the sprite sheet
+    };
+
+    world
+        .create_entity()
+        .with(sprite_render)
+        .with(Ball {
+            radius: BALL_RADIUS,
+            velocity: [BALL_VELOCITY_X, BALL_VELOCITY_Y],
+        })
+        .with(local_transform)
         .build();
 }
