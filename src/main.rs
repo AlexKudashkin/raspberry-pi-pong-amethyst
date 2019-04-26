@@ -12,7 +12,7 @@ use amethyst::{
 };
 
 fn main() -> amethyst::Result<()> {
-    //amethyst::start_logger(Default::default());
+//    amethyst::start_logger(Default::default());
 
     use crate::pong::Pong;
     use crate::systems::paddle::PaddleSystem;
